@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrasi Pendaftar</title>
+    <style>
+        .tab {
+            display: none;
+        }
+
+        .tab.active {
+            display: block;
+        }
+
+        .tab-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
+        }
+
+        .tab-header button {
+            padding: 0.5rem 1rem;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        .form-registrasi {
+            padding: 1rem;
+        }
+
+        .form-registrasi input[type="text"],
+        .form-registrasi input[type="number"] {
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            width: 100%;
+        }
+
+        .form-registrasi input[type="submit"] {
+            background-color: #333;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #333;
+            padding: 0.5rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: #333;
+            color: #fff;
+        }
+
+        #resume-pendaftar {
+            padding: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="tab-header">
+        <button id="btn-registrasi">Registrasi</button>
+        <button id="btn-list-pendaftar">List Pendaftar</button>
+    </div>
+    <div id="tab-registrasi" class="tab active">
+        <form class="form-registrasi" id="form-registrasi">
+            <div>
+                <label for="nama">Nama:</label>
+                <input type="text" id="nama" name="nama">
+            </div>
+            <div>
+                <label for="umur">Umur:</label>
+                <input type="number" id="umur" name="umur">
+            </div>
+            <div>
+                <label for="uang-sangu">Uang Sangu:</label>
+                <input type="number" id="uang-sangu" name="uangSangu">
+            </div>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+    <div id="tab-list-pendaftar" class="tab">
+        <table id="table-list-pendaftar">
+            <thead>
+                <tr>
+                    <th>Nama</th>
+                    <!-- continued from previous code -->
+                    <th>Umur</th>
+                    <th>Uang Sangu</th>
+                </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+        </table>
+        <div id="resume-pendaftar"></div>
+    </div>
+    <script>
+        class Pendaftar {
+            constructor(nama, umur, uangSangu) {
+                this.nama = nama;
+                this.umur = umur;
+                this.uangSangu = uangSangu;
+            }
+        }
+
+        class DataPendaftar {
+            constructor() {
+                this.pendaftar = [];
+            }
+
+            tambahPendaftar(pendaftar) {
+                this.pendaftar.push(pendaftar);
+            }
+            rataRataUmur() {
+                let totalUmur = 0;
+                for (const pendaftar of this.pendaftar) {
+                    totalUmur += pendaftar.umur;
+                }
+                return totalUmur / this.pendaftar.length;
+            }
+
+            rataRataUangSangu() {
+                let totalUangSangu = 0;
+                for (const pendaftar of this.pendaftar) {
+                    totalUangSangu += pendaftar.uangSangu;
+                }
+                return totalUangSangu / this.pendaftar.length;
+            }
+        }
+
+        let formRegistrasi = document.querySelector("#form-registrasi");
+        let tabRegistrasi = document.querySelector("#tab-registrasi");
+        let tabListPendaftar = document.querySelector("#tab-list-pendaftar");
+        let btnRegistrasi = document.querySelector("#btn-registrasi");
+        let btnListPendaftar = document.querySelector("#btn-list-pendaftar");
+        let tableBody = document.querySelector("#table-body");
+        let resumePendaftar = document.querySelector("#resume-pendaftar");
+
+        let dataPendaftar = new DataPendaftar();
+
+        formRegistrasi.addEventListener("submit", function (event) {
+            event.preventDefault();
+            const nama = formRegistrasi.nama.value;
+            const umur = parseInt(formRegistrasi.umur.value);
+            const uangSangu = parseInt(formRegistrasi.uangSangu.value);
+
+            if (nama.length >= 10 && umur >= 25 && uangSangu >= 100000 && uangSangu <= 1000000) {
+                const pendaftar = new Pendaftar(nama, umur, uangSangu);
+                dataPendaftar.tambahPendaftar(pendaftar);
+
+                tableBody.innerHTML += `
+      <tr>
+        <td>${pendaftar.nama}</td>
+        <td>${pendaftar.umur}</td>
+        <td>${pendaftar.uangSangu}</td>
+      </tr>`;
+
+                formRegistrasi.reset();
+            } else {
+                alert("Data tidak sesuai kriteria");
+            }
+        });
+
+        btnRegistrasi.addEventListener("click", () => {
+            tabRegistrasi.style.display = "block";
+            tabListPendaftar.style.display = "none";
+        });
+        btnListPendaftar.addEventListener("click", () => {
+            tabRegistrasi.style.display = "none";
+            tabListPendaftar.style.display = "block";
+            resumePendaftar.innerHTML = `Rata-rata pendaftar memiliki uang sangu sebesar 
+            ${dataPendaftar.rataRataUangSangu().toLocaleString()} 
+      dengan rata-rata umur ${dataPendaftar.rataRataUmur().toFixed(2)}`;
+
+            tableBody.innerHTML = "";
+            for (const pendaftar of dataPendaftar.pendaftar) {
+                tableBody.innerHTML += `
+      <tr>
+        <td>${pendaftar.nama}</td>
+        <td>${pendaftar.umur}</td>
+        <td>${pendaftar.uangSangu}</td>
+      </tr>`;
+            }
+        });
+
+    </script>
+</body>
+
+</html>
